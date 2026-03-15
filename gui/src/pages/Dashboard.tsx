@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react"
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts"
 import type { SystemStatus } from "../types"
 import { useTheme } from "../theme"
-import { getAuthToken } from "../utils/auth"
+import { apiFetch } from '../utils/api'
 
 interface Props {
   data: SystemStatus
@@ -167,11 +167,9 @@ export default function Dashboard({ data, onNavigate }: Props) {
   const sub = theme === 'light' ? 'text-gray-500' : 'text-[#a3a3a3]'
 
   useEffect(() => {
-    const h = { headers: { Authorization: `Bearer ${getAuthToken()}` } }
-    fetch('/api/weather/cities', h).then(r => r.json()).then(d => setWeather(d.cities || [])).catch(() => {})
-    // Only fetch /api/location/all (which includes all roles); skip /api/location/track to avoid redundant request and state overwrite
-    fetch('/api/location/all', h).then(r => r.json()).then(d => setLocations(d.locations || {})).catch(() => {})
-    fetch('/api/dashboard/summary', h).then(r => r.json()).then(d => setSummary(d)).catch(() => {})
+    apiFetch('/api/weather/cities').then(r => r.json()).then(d => setWeather(d.cities || [])).catch(() => {})
+    apiFetch('/api/location/all').then(r => r.json()).then(d => setLocations(d.locations || {})).catch(() => {})
+    apiFetch('/api/dashboard/summary').then(r => r.json()).then(d => setSummary(d)).catch(() => {})
   }, [])
 
   const onlineCount = data.botAccounts.filter(b => b.status === "online").length

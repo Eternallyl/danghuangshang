@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from "react"
+import { useState, useEffect, lazy, Suspense } from "react"
 import type { TabName } from "./types"
 import { useStatus } from "./hooks/useStatus"
 import { useTheme } from "./theme"
@@ -53,6 +53,17 @@ function App() {
   const [sessionFilter, setSessionFilter] = useState<string | undefined>(undefined)
   const { theme, toggle: toggleTheme } = useTheme()
   const { data, loading, error, lastUpdated, refresh } = useStatus()
+
+  // 监听全局登出事件（401 时触发）
+  useEffect(() => {
+    const handleLogout = () => {
+      setIsLoggedIn(false)
+    }
+    window.addEventListener('auth-logout', handleLogout)
+    return () => {
+      window.removeEventListener('auth-logout', handleLogout)
+    }
+  }, [])
 
   if (!isLoggedIn) {
     return <Login onLogin={() => setIsLoggedIn(true)} />

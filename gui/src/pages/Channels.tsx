@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useTheme } from "../theme"
-import { getAuthToken } from "../utils/auth"
+import { apiFetch } from '../utils/api'
 
 interface Platform {
   name: string; status: 'connected' | 'disconnected'; channels: number; accounts?: number
@@ -55,10 +55,9 @@ export default function Channels() {
   const fetchData = async () => {
     setLoading(true)
     try {
-      const headers = { Authorization: `Bearer ${getAuthToken()}` }
       const [platformsRes, statusRes] = await Promise.all([
-        fetch('/api/platforms', { headers }),
-        fetch('/api/status', { headers })
+        apiFetch('/api/platforms'),
+        apiFetch('/api/status')
       ])
       
       const platformsData = await platformsRes.json()

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import type { SystemStatus } from "../types"
 import { useTheme } from "../theme"
-import { getAuthToken } from "../utils/auth"
+import { apiFetch } from '../utils/api'
 
 interface Props { data: SystemStatus }
 
@@ -31,7 +31,7 @@ export default function MessageLogs({ data }: Props) {
       // Try /api/logs/list first (has filtering), fallback to /api/logs
       let allLogs: LogEntry[] = []
       try {
-        const r = await fetch(`/api/logs/list?${params}`, { headers: { Authorization: `Bearer ${getAuthToken()}` } })
+        const r = await apiFetch('/api/logs/list?${params}')
         if (r.ok) {
           const d = await r.json()
           allLogs = d.logs || []
@@ -40,7 +40,7 @@ export default function MessageLogs({ data }: Props) {
 
       if (allLogs.length === 0) {
         // Fallback to /api/logs
-        const r = await fetch(`/api/logs?limit=500`, { headers: { Authorization: `Bearer ${getAuthToken()}` } })
+        const r = await apiFetch('/api/logs?limit=500')
         const d = await r.json()
         allLogs = d.logs || []
       }

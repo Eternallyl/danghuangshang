@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useTheme } from "../theme"
-import { getAuthToken } from "../utils/auth"
+import { apiFetch } from '../utils/api'
 
 interface Settings {
   refreshInterval: number
@@ -32,7 +32,7 @@ export default function Settings() {
     if (saved) try { setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(saved) }) } catch { }
 
     // Fetch gateway config
-    fetch('/api/config', { headers: { Authorization: `Bearer ${getAuthToken()}` } })
+    apiFetch('/api/config')
       .then(r => r.json())
       .then(d => { setGatewayConfig(d.config || d); setConfigLoading(false) })
       .catch(() => setConfigLoading(false))

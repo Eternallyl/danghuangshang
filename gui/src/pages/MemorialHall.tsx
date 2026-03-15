@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useTheme } from "../theme"
-import { getAuthToken } from "../utils/auth"
+import { apiFetch } from '../utils/api'
 
 interface PendingItem {
   id: string
@@ -28,9 +28,7 @@ export default function MemorialHall() {
     setLoading(true)
     try {
       // 获取 Cron 任务状态
-      const cronRes = await fetch('/api/cron', {
-        headers: { 'Authorization': `Bearer ${getAuthToken()}` }
-      })
+      const cronRes = await apiFetch('/api/cron')
       
       const pendingItems: PendingItem[] = []
       
@@ -54,9 +52,7 @@ export default function MemorialHall() {
       }
 
       // 获取会话状态
-      const sessionsRes = await fetch('/api/sessions?limit=20', {
-        headers: { 'Authorization': `Bearer ${getAuthToken()}` }
-      })
+      const sessionsRes = await apiFetch('/api/sessions?limit=20')
       
       if (sessionsRes.ok) {
         const sessionsData = await sessionsRes.json()
@@ -80,9 +76,7 @@ export default function MemorialHall() {
       }
 
       // 获取节点状态
-      const nodesRes = await fetch('/api/nodes', {
-        headers: { 'Authorization': `Bearer ${getAuthToken()}` }
-      })
+      const nodesRes = await apiFetch('/api/nodes')
       
       if (nodesRes.ok) {
         const nodesData = await nodesRes.json()

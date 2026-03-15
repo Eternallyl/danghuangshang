@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useTheme } from "../theme"
-import { getAuthToken } from "../utils/auth"
+import { apiFetch } from '../utils/api'
 import {
   PieChart,
   Pie,
@@ -63,9 +63,9 @@ export default function NotionBoard() {
     setLoading(true)
     try {
       const [dailyRes, financeRes, personnelRes] = await Promise.all([
-        fetch('/api/notion/data?type=daily', { headers: { 'Authorization': `Bearer ${getAuthToken()}` } }),
-        fetch('/api/notion/data?type=finance', { headers: { 'Authorization': `Bearer ${getAuthToken()}` } }),
-        fetch('/api/notion/data?type=personnel', { headers: { 'Authorization': `Bearer ${getAuthToken()}` } })
+        apiFetch('/api/notion/data?type=daily'),
+        apiFetch('/api/notion/data?type=finance'),
+        apiFetch('/api/notion/data?type=personnel')
       ])
       
       const [daily, finance, personnel] = await Promise.all([

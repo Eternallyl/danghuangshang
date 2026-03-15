@@ -1,11 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import type { SystemStatus } from "../types"
+import { apiFetch } from "../utils/api"
 
 const DEFAULT_REFRESH_INTERVAL = 30000
-
-function getAuthToken(): string {
-  return localStorage.getItem('boluo_auth_token') || ''
-}
 
 function getRefreshInterval(): number {
   try {
@@ -33,10 +30,7 @@ export function useStatus() {
     const controller = new AbortController()
     abortRef.current = controller
     try {
-      const res = await fetch("/api/status", {
-        headers: {
-          'Authorization': `Bearer ${getAuthToken()}`
-        },
+      const res = await apiFetch("/api/status", {
         signal: controller.signal
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
@@ -48,6 +42,7 @@ export function useStatus() {
       }
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') return
+      // 401 错误已在 apiFetch 中处理，此处不再重复处理
       if (!controller.signal.aborted) {
         setError(err instanceof Error ? err.message : "Unknown error")
       }

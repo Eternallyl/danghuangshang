@@ -22,18 +22,24 @@ export default function Login({ onLogin }: LoginProps) {
     setError('')
 
     try {
+      // 临时设置 token 用于验证
+      localStorage.setItem('boluo_auth_token', token)
       const res = await fetch('/api/status', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       
       if (res.ok) {
-        localStorage.setItem('boluo_auth_token', token)
         onLogin()
       } else {
+        // 401 时清除 token
+        if (res.status === 401) {
+          localStorage.removeItem('boluo_auth_token')
+        }
         setError('令牌验证失败，请检查后重试')
       }
     } catch {
       setError('网络错误，请稍后重试')
+      localStorage.removeItem('boluo_auth_token')
     }
     
     setLoading(false)

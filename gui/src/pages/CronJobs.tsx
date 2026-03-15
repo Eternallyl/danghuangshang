@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useTheme } from "../theme"
-import { getAuthToken } from "../utils/auth"
+import { apiFetch } from '../utils/api'
 
 interface CronJob {
   id: string
@@ -50,7 +50,7 @@ export default function CronJobs() {
 
   const fetchJobs = async () => {
     try {
-      const r = await fetch('/api/cron', { headers: { Authorization: `Bearer ${getAuthToken()}` } })
+      const r = await apiFetch('/api/cron')
       if (r.ok) {
         const d = await r.json()
         setJobs(d.jobs || [])
@@ -64,10 +64,7 @@ export default function CronJobs() {
   const handleRun = async (jobId: string, jobName: string) => {
     setActionLoading(jobId)
     try {
-      const r = await fetch(`/api/cron/run/${encodeURIComponent(jobId)}`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${getAuthToken()}` },
-      })
+      const r = await apiFetch(`/api/cron/run/${encodeURIComponent(jobId)}`, { method: 'POST' })
       if (r.ok) {
         showToast(`✅ ${jobName} 已触发运行`)
         setTimeout(fetchJobs, 2000)
@@ -75,7 +72,9 @@ export default function CronJobs() {
         showToast(`❌ 运行失败: ${r.statusText}`, 'error')
       }
     } catch (e: any) {
-      showToast(`❌ 运行失败: ${e.message}`, 'error')
+      if (e.message !== 'Authentication failed') {
+        showToast(`❌ 运行失败：${e.message}`, 'error')
+      }
     }
     setActionLoading(null)
   }
@@ -85,7 +84,7 @@ export default function CronJobs() {
     try {
       const r = await fetch(`/api/cron/jobs/${encodeURIComponent(jobId)}`, {
         method: 'PATCH',
-        headers: { Authorization: `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: !currentEnabled }),
       })
       if (r.ok) {

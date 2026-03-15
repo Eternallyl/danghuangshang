@@ -5,7 +5,7 @@ import {
 } from "recharts"
 import type { SystemStatus } from "../types"
 import { useTheme } from "../theme"
-import { getAuthToken } from "../utils/auth"
+import { apiFetch } from '../utils/api'
 
 interface Props { data: SystemStatus }
 
@@ -76,10 +76,9 @@ export default function SystemHealth({ data }: Props) {
 
   const fetchMetrics = async () => {
     try {
-      const h = { headers: { Authorization: `Bearer ${getAuthToken()}` } }
       const [mRes, hRes] = await Promise.all([
-        fetch('/api/system/metrics', h),
-        fetch('/api/health', h),
+        apiFetch('/api/system/metrics'),
+        apiFetch('/api/health'),
       ])
       if (mRes.ok) {
         const d = await mRes.json()

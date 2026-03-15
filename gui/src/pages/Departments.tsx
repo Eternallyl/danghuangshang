@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import type { SystemStatus, BotAccount } from "../types"
 import { useTheme } from "../theme"
-import { getAuthToken } from "../utils/auth"
+import { apiFetch } from '../utils/api'
 
 interface Props { data: SystemStatus }
 
@@ -41,7 +41,7 @@ export default function Departments({ data }: Props) {
 
   // Fetch activity data from sessions
   useEffect(() => {
-    fetch('/api/sessions?limit=100', { headers: { Authorization: `Bearer ${getAuthToken()}` } })
+    apiFetch('/api/sessions?limit=100')
       .then(r => r.json())
       .then(d => {
         const map: Record<string, DeptActivity> = {}
@@ -67,10 +67,8 @@ export default function Departments({ data }: Props) {
       setMsgsLoading(botName)
       try {
         // Use /api/departments/:name/recent instead of re-fetching all sessions
-        const deptName = data.botAccounts.find(b => b.name === botName)?.displayName || botName
-        const deptR = await fetch(`/api/departments/${encodeURIComponent(deptName)}/recent?limit=6`, {
-          headers: { Authorization: `Bearer ${getAuthToken()}` }
-        })
+        const displayName = data.botAccounts.find(b => b.name === botName)?.displayName || botName
+        const deptR = await apiFetch(`/api/departments/${encodeURIComponent(displayName)}/recent?limit=6`)
         if (deptR.ok) {
           const deptD = await deptR.json()
           setRecentMsgs(prev => ({ ...prev, [botName]: deptD.messages || [] }))

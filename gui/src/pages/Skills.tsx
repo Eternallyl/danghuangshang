@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useTheme } from "../theme"
-import { getAuthToken } from "../utils/auth"
+import { apiFetch } from "../utils/api"
 
 interface SkillInfo {
   name: string
@@ -54,7 +54,7 @@ export default function Skills() {
 
   const fetchSkills = async () => {
     try {
-      const r = await fetch('/api/skills', { headers: { Authorization: `Bearer ${getAuthToken()}` } })
+      const r = await apiFetch('/api/skills')
       if (r.ok) {
         const d = await r.json()
         setSkills(d.skills || [])
@@ -68,9 +68,7 @@ export default function Skills() {
 
   const fetchDetail = async (name: string) => {
     try {
-      const r = await fetch(`/api/skills/${encodeURIComponent(name)}`, {
-        headers: { Authorization: `Bearer ${getAuthToken()}` },
-      })
+      const r = await apiFetch(`/api/skills/${encodeURIComponent(name)}`)
       if (r.ok) {
         const d = await r.json()
         setSelectedSkill(d)
@@ -81,9 +79,9 @@ export default function Skills() {
   const handleInstall = async (slug: string) => {
     setActionLoading(slug)
     try {
-      const r = await fetch('/api/skills/install', {
+      const r = await apiFetch('/api/skills/install', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slug }),
       })
       const d = await r.json()
@@ -94,7 +92,9 @@ export default function Skills() {
         showToast(`❌ 安装失败: ${d.error || d.output || '未知错误'}`, 'error')
       }
     } catch (e: any) {
-      showToast(`❌ 安装失败: ${e.message}`, 'error')
+      if (e.message !== 'Authentication failed') {
+        showToast(`❌ 安装失败：${e.message}`, 'error')
+      }
     }
     setActionLoading(null)
   }
@@ -103,9 +103,9 @@ export default function Skills() {
     const key = slug || '__all__'
     setActionLoading(key)
     try {
-      const r = await fetch('/api/skills/update', {
+      const r = await apiFetch('/api/skills/update', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slug }),
       })
       const d = await r.json()
@@ -116,7 +116,9 @@ export default function Skills() {
         showToast(`❌ 更新失败: ${d.error || '未知错误'}`, 'error')
       }
     } catch (e: any) {
-      showToast(`❌ 更新失败: ${e.message}`, 'error')
+      if (e.message !== 'Authentication failed') {
+        showToast(`❌ 更新失败：${e.message}`, 'error')
+      }
     }
     setActionLoading(null)
   }
@@ -125,9 +127,9 @@ export default function Skills() {
     setShowExplore(true)
     setExploreLoading(true)
     try {
-      const r = await fetch('/api/skills/explore', {
+      const r = await apiFetch('/api/skills/explore', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
       })
       const d = await r.json()
@@ -140,9 +142,9 @@ export default function Skills() {
     if (!hubSearch.trim()) return
     setHubSearching(true)
     try {
-      const r = await fetch('/api/skills/search', {
+      const r = await apiFetch('/api/skills/search', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: hubSearch }),
       })
       const d = await r.json()

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useTheme } from "../theme"
-import { getAuthToken } from "../utils/auth"
+import { apiFetch } from '../utils/api'
 
 interface Node {
   id: string
@@ -19,9 +19,7 @@ export default function Nodes() {
 
   const fetchNodes = async () => {
     try {
-      const res = await fetch("/api/nodes", {
-        headers: { 'Authorization': `Bearer ${getAuthToken()}` }
-      })
+      const res = await apiFetch("/api/nodes")
       if (res.ok) {
         const data = await res.json()
         setNodes(data.nodes || [])

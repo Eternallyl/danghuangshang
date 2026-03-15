@@ -5,7 +5,7 @@ import {
 } from "recharts"
 import type { SystemStatus } from "../types"
 import { useTheme } from "../theme"
-import { getAuthToken } from "../utils/auth"
+import { apiFetch } from '../utils/api'
 
 interface Props { data: SystemStatus }
 
@@ -29,7 +29,7 @@ export default function TokenStats({ data }: Props) {
   const sub = theme === 'light' ? 'text-gray-500' : 'text-[#a3a3a3]'
 
   useEffect(() => {
-    fetch('/api/tokens', { headers: { Authorization: `Bearer ${getAuthToken()}` } })
+    apiFetch('/api/tokens')
       .then(r => r.json())
       .then(d => {
         setDeptTokens(d.byDepartment || [])

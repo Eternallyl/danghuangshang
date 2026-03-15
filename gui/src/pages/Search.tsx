@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useTheme } from "../theme"
-import { getAuthToken } from "../utils/auth"
+import { apiFetch } from '../utils/api'
 
 type SearchType = 'all' | 'logs' | 'messages' | 'sessions'
 
@@ -32,9 +32,7 @@ export default function Search() {
       // 搜索日志 — use /api/logs/list with server-side search parameter
       if (searchType === 'all' || searchType === 'logs') {
         try {
-          const logsRes = await fetch(`/api/logs/list?limit=200&search=${encodeURIComponent(query)}`, {
-            headers: { 'Authorization': `Bearer ${getAuthToken()}` }
-          })
+          const logsRes = await apiFetch('/api/logs/list?limit=200&search=${encodeURIComponent(query)}')
           const logsData = await logsRes.json()
           const logs = logsData.logs || []
           
@@ -53,9 +51,7 @@ export default function Search() {
       // 搜索消息
       if (searchType === 'all' || searchType === 'messages') {
         try {
-          const msgsRes = await fetch('/api/messages?limit=100', {
-            headers: { 'Authorization': `Bearer ${getAuthToken()}` }
-          })
+          const msgsRes = await apiFetch('/api/messages?limit=100')
           const msgsData = await msgsRes.json()
           const messages = msgsData.messages || []
           
@@ -76,9 +72,7 @@ export default function Search() {
       // 搜索会话
       if (searchType === 'all' || searchType === 'sessions') {
         try {
-          const sessionsRes = await fetch('/api/sessions?limit=50', {
-            headers: { 'Authorization': `Bearer ${getAuthToken()}` }
-          })
+          const sessionsRes = await apiFetch('/api/sessions?limit=50')
           const sessionsData = await sessionsRes.json()
           const sessions = sessionsData.sessions || []
           

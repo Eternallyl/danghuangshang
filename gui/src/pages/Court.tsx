@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { useTheme } from "../theme"
-import { getAuthToken } from "../utils/auth"
+import { apiFetch } from '../utils/api'
 
 // 频道 ID 可通过环境变量配置；为空时前端会跳过频道消息获取，下旨走 gateway 通道
 const CONFIGURED_COURT_CHANNEL = import.meta.env.VITE_COURT_CHANNEL || ''
@@ -114,9 +114,7 @@ export default function Court() {
     }
     setLoadingMessages(true)
     try {
-      const r = await fetch(`/api/channel-messages?channel=${CONFIGURED_COURT_CHANNEL}&limit=15`, {
-        headers: { Authorization: `Bearer ${getAuthToken()}` }
-      })
+      const r = await apiFetch('/api/channel-messages?channel=${CONFIGURED_COURT_CHANNEL}&limit=15')
       const d = await r.json()
       setChannelMessages(d.messages || [])
       setTimeout(() => msgRef.current?.scrollTo(0, msgRef.current.scrollHeight), 100)
@@ -125,7 +123,7 @@ export default function Court() {
   }
 
   useEffect(() => {
-    fetch('/api/bots', { headers: { Authorization: `Bearer ${getAuthToken()}` } })
+    apiFetch('/api/bots')
       .then(r => r.json()).then(d => setBots(d.bots || [])).catch(() => {})
     fetchChannelMessages()
     // Only set up polling interval if a court channel is configured
@@ -146,7 +144,7 @@ export default function Court() {
     try {
       const r = await fetch('/api/command', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...(CONFIGURED_COURT_CHANNEL ? { channel: CONFIGURED_COURT_CHANNEL } : {}), message: finalMessage, botId: target })
       })
       const d = await r.json()

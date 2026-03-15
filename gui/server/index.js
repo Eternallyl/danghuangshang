@@ -55,7 +55,12 @@ const AGENT_DEPT_MAP = {
   'hanlin_jiantao': '翰林院·检讨',
   'hanlin_shujishi': '翰林院·庶吉士',
   'taiyiyuan': '太医院', 'guozijian': '国子监',
-  'yushanfang': '御膳房'
+  'yushanfang': '御膳房',
+  'honglusi': '弘禄寺',
+  'jiangzuojian': '将作监',
+  'qintianjian': '钦天监',
+  'shibosi': '市舶司',
+  'tongzhengsi': '通政司'
 };
 
 const HOME = process.env.HOME || '/home/ubuntu';
